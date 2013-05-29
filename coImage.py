@@ -454,8 +454,8 @@ class EmptyImage(AbstractImage):
     # [EC: to start with a different solid color]
     def setSolidColor(self,color):
         """Create an empty image with the specified color."""
-        for col in range(self.width()):
-            for row in range(self.height()):
+        for col in range(self.width):
+            for row in range(self.height):
                 self.setPixel(col,row, Pixel(color[0],color[1],color[2]))
 		
         
@@ -481,8 +481,7 @@ if __name__ == '__main__':
             myImage.setPixel(col,row,v)
     myImage.setPosition(myImage.getWidth()+1,0)
     myImage.draw(win)
-    #print(win.getMouse())
-    myImage.save('/Users/ernestojfcosta/tmp/testcoimage.jpg')
+    #print(win.getMouse())fig
     #print(myImage.toList())
     win.exitOnClick()
 
