@@ -294,7 +294,8 @@ class AbstractImage(object):
             self.createBlankImage(height,width)
             for row  in range(height):
                 for col in range(width):
-                    self.setPixel(x,y,Pixel(data[row][col]))
+                    #self.setPixel(x,y,Pixel(data[row][col])) # [EC: bug??]
+                    self.setPixel(col,row,Pixel(data[row][col][0],data[row][col][1],data[row][col][2]))
         elif height > 0 and width > 0:
             self.createBlankImage(height,width)
         elif imobj:
@@ -305,8 +306,8 @@ class AbstractImage(object):
         else:
             self.width = self.im.width()
             self.height = self.im.height()
-        self.centerX = self.width/2+3     # +3 accounts for the ~3 pixel border in Tk windows
-        self.centerY = self.height/2+3
+        self.centerX = self.width//2+3     # +3 accounts for the ~3 pixel border in Tk windows [EC : integer division]
+        self.centerY = self.height//2+3 # [EC : integer division]
         self.id = None
 
     def loadPILImage(self,fname):
@@ -340,9 +341,9 @@ class AbstractImage(object):
 
 
     def clone(self):
-	     """Return a copy of this image"""
-	     newI = AbstractImage(imobj=self.im)
-	     return newI
+	    """Return a copy of this image"""
+	    newI = AbstractImage(imobj=self.im)
+	    return newI
         
     def getHeight(self):
         """Return the height of the image"""
@@ -376,8 +377,8 @@ class AbstractImage(object):
         """Set the position in the window where the top left corner of the window should be."""
         self.top = y
         self.left = x
-        self.centerX = x + (self.width/2)+3
-        self.centerY = y + (self.height/2)+3
+        self.centerX = x + (self.width//2)+3  # [EC : integer division]
+        self.centerY = y + (self.height//2)+3  # [EC : integer division]
     
     def getImage(self):
         if pilAvailable:
@@ -449,6 +450,14 @@ class FileImage(AbstractImage):
 class EmptyImage(AbstractImage):
     def __init__(self,cols,rows):
         super(EmptyImage, self).__init__(height = rows, width = cols)
+    
+    # [EC: to start with a different solid color]
+    def setSolidColor(self,color):
+        """Create an empty image with the specified color."""
+        for col in range(self.width()):
+            for row in range(self.height()):
+                self.setPixel(col,row, Pixel(color[0],color[1],color[2]))
+		
         
 class ListImage(AbstractImage):
     def __init__(self,thelist):
@@ -456,25 +465,25 @@ class ListImage(AbstractImage):
 
 # Example program  Read in an image and calulate the negative.
 if __name__ == '__main__':
-    win = ImageWin("My Window",480,640)
-    oImage = FileImage('lcastle.jpg')
+    win = ImageWin("My Window",2*648,432)
+    oImage = FileImage('/images/calvin_leia.jpg')
     print(oImage.getWidth(), oImage.getHeight())
     oImage.draw(win)
     myImage = oImage.copy()
 
     for row in range(myImage.getHeight()):
         for col in range(myImage.getWidth()):
-             v = myImage.getPixel(col,row)
-             v.red = 255 - v.red
-             v.green = 255 - v.green
-             v.blue = 255 - v.blue
-#             x = map(lambda x: 255-x, v)
-             myImage.setPixel(col,row,v)
+            v = myImage.getPixel(col,row)
+            v.red = 255 - v.red
+            v.green = 255 - v.green
+            v.blue = 255 - v.blue
+            #x = map(lambda x: 255-x, v)
+            myImage.setPixel(col,row,v)
     myImage.setPosition(myImage.getWidth()+1,0)
     myImage.draw(win)
-    print(win.getMouse())
-    myImage.save('/Users/bmiller/tmp/testfoo.jpg')
-    print(myImage.toList())
+    #print(win.getMouse())
+    myImage.save('/Users/ernestojfcosta/tmp/testcoimage.jpg')
+    #print(myImage.toList())
     win.exitOnClick()
 
 
